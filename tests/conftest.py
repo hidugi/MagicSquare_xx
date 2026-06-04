@@ -5,12 +5,17 @@ from pathlib import Path
 
 import pytest
 
-_SRC = Path(__file__).resolve().parent.parent / "src"
+_ROOT = Path(__file__).resolve().parent.parent
+_SRC = _ROOT / "src"
+_TESTS = _ROOT / "tests"
 sys.path.insert(0, str(_SRC))
 for _mod in ("entity.constants", "entity"):
     sys.modules.pop(_mod, None)
 
 from entity.constants import GRID_SIZE
+
+if str(_TESTS) not in sys.path:
+    sys.path.append(str(_TESTS))
 
 
 @pytest.fixture

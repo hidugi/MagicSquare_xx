@@ -1,0 +1,2 @@
+# Dev dependencies — SSL 프록시 환경: scripts/install-dev.ps1 사용
+pytest>=8.0

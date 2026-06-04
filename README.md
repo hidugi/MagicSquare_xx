@@ -9,6 +9,7 @@
 | 검사 | **10선**(행 4 + 열 4 + 주대각 2) 합 **34** |
 | Phase 1 | `validate_board` + Dual-Track pytest |
 | RED To Do | [`docs/TDD-RED-TODO.md`](docs/TDD-RED-TODO.md) (상세 설계표) |
+| Golden Master | [`docs/GOLDEN_MASTER.md`](docs/GOLDEN_MASTER.md) (GREEN PASS 기준) |
 | PRD | [`docs/PRD.md`](docs/PRD.md) |
 
 ---
@@ -63,7 +64,7 @@ MagicSquare_xx/
     └── 02.REPORT.md          # ECB Harness
 ```
 
-> **현재 상태:** ECB Harness 준비 완료 · **RED 단계 진행 중** (아래 체크리스트). RED에서는 `tests/`만 수정, `src/`는 GREEN.
+> **현재 상태:** **D-LOC-01 GREEN PASS** · Golden Master 고정 ([`docs/GOLDEN_MASTER.md`](docs/GOLDEN_MASTER.md)). 다음: D-LOC-02·03 또는 D-001~ Logic RED.
 
 ---
 
@@ -73,6 +74,20 @@ MagicSquare_xx/
 2. [`Report/01.MagicSquare_ProblemDefinition_Report.md`](Report/01.MagicSquare_ProblemDefinition_Report.md) — Invariant, R-G-I-O, 세션 3 범위  
 3. [`docs/PRD.md`](docs/PRD.md) — API·오류 코드·Phase 로드맵·수용 기준  
 4. [`docs/TDD-RED-TODO.md`](docs/TDD-RED-TODO.md) — RED 설계표·Given·추적성  
+5. [`docs/GOLDEN_MASTER.md`](docs/GOLDEN_MASTER.md) — GREEN PASS·Golden JSON  
+
+---
+
+## Golden Master (GREEN PASS)
+
+| Test ID | Golden | Then (1-index) | 상태 |
+|---------|--------|----------------|------|
+| **D-LOC-01** | [`tests/golden/d_loc_01_g1.json`](tests/golden/d_loc_01_g1.json) | `(2,4)`, `(3,3)` | ✅ PASS |
+| **D-SOL-01** | [`tests/golden/d_sol_01_g1_step_a.approved.txt`](tests/golden/d_sol_01_g1_step_a.approved.txt) | int[6] `2 4 8 3 3 7` | ✅ matched |
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests/entity/test_d_loc_01.py -v
+```
 
 ---
 
@@ -87,13 +102,13 @@ MagicSquare_xx/
 - [ ] **1.** Logic — `D-001` MagicConstant RED → GREEN
 - [ ] **2.** Logic — `D-002`~`D-006` entity Rule RED → GREEN
 - [ ] **3.** Logic — `D-007`~`D-008` control `validate_board` RED → GREEN
-- [ ] **4.** Logic *(선택 P1)* — `D-009` `find_blank_coords` RED → GREEN
+- [x] **4.** Logic *(P1)* — **D-LOC-01** `find_blank_coords` RED → **GREEN PASS** *(Golden Master)*
 - [ ] **5.** Boundary — `U-IN-*` 입력 검증 RED → GREEN
 - [ ] **6.** Boundary — `U-OUT-*` · `U-FLOW-*` RED → GREEN
 
 ### 사전 준비 — Given 픽스처
 
-- [ ] **G1** — 문제정의 부록 격자 (빈칸 `(1,3)`, `(2,2)` 0-based)
+- [x] **G1** — `tests/conftest.py` · 빈칸 0-based `(1,3)`, `(2,2)` · Golden [`d_loc_01_g1.json`](tests/golden/d_loc_01_g1.json)
 - [ ] **G_blank_0** — `0` 없음 → `BLANK_COUNT`
 - [ ] **G_dup** — 1~16 중복
 - [ ] **G_line_bad** — 빈칸 0, 행 OK·대각 NG (SC-2)
@@ -115,7 +130,9 @@ MagicSquare_xx/
 - [ ] **D-007b** — 동일 파일 · **G_blank_0** → `BLANK_COUNT` · FAIL 확인
 - [ ] **D-007c** — 동일 파일 · **G_line_bad** → `LINE_SUM` (SC-2) · FAIL 확인
 - [ ] **D-008** — 동일 파일 · **G1** 두 번 호출 → 동일 결과 (SC-3) · FAIL 확인
-- [ ] **D-009** *(선택)* — `test_d_find_blank_coords.py` · **G1** → `((1,3),(2,2))` · FAIL 확인
+- [x] **D-LOC-01** — `test_d_loc_01.py` · **G1** → 1-index `((2,4),(3,3))` · **GREEN PASS**
+- [ ] **D-LOC-02** · **D-LOC-03** — `BLANK_COUNT` 예외 *(후속)*
+- [ ] **D-009** *(레거시 ID)* — D-LOC-01과 동일 계약, 별도 파일 통합 여부 팀 결정
 
 ### Boundary Track — UI (`tests/boundary/test_u_*.py`)
 
@@ -183,9 +200,12 @@ python -m pytest tests/boundary/test_u_input_shape.py -v
 cd c:\DEV\MagicSquare_xx
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-pip install -e ".[dev]"
+.\scripts\install-dev.ps1
 python -m pytest -v
 ```
+
+> **SSL 오류** (`CERTIFICATE_VERIFY_FAILED`) 시 `pip install -e ".[dev]"` 대신 위 `install-dev.ps1` 사용.  
+> 수동 설치: `pip install -r requirements-dev.txt --trusted-host pypi.org --trusted-host files.pythonhosted.org`
 
 Harness만 있을 때는 **0 tests collected** 가 정상이다. RED 테스트 추가 후에는 해당 파일이 **FAILED** 또는 **ImportError** 여야 RED 완료다.
 
@@ -197,6 +217,9 @@ Harness만 있을 때는 **0 tests collected** 가 정상이다. RED 테스트 �
 |------|------|
 | [PRD](docs/PRD.md) | 입·출력, 오류 코드, NFR |
 | [TDD RED To Do](docs/TDD-RED-TODO.md) | Boundary·Logic RED 설계표 (SSoT) |
+| [Golden Master](docs/GOLDEN_MASTER.md) | GREEN PASS·Golden JSON |
+| [GREEN PASS 보고](Report/04.REPORT.md) | STEP 4 · D-LOC-01 |
+| [Golden Master 보고](Report/05.REPORT.md) | STEP 5 · D-SOL-01 · pytest 설치 |
 | [문제 정의 보고서](Report/01.MagicSquare_ProblemDefinition_Report.md) | Why, Invariant, 8계층(세션 3) |
 | [Harness 보고서](Report/02.REPORT.md) | ECB·Dual-Track·pytest 골격 |
 | [Mom Test 보고서](Report/01.REPORT.md) | 인터뷰·증거·채점 |
