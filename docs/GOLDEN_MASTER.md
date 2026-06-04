@@ -14,7 +14,8 @@
 
 | Test ID | Golden 파일 | When | Then (1-index, row-major) |
 |---------|-------------|------|---------------------------|
-| **D-LOC-01** | [`tests/golden/d_loc_01_g1.json`](../tests/golden/d_loc_01_g1.json) | `find_blank_coords(G1)` | `[[2,4],[3,3]]` |
+| **D-LOC-01** | [`tests/golden/d_loc_01_g1_step_a.approved.txt`](../tests/golden/d_loc_01_g1_step_a.approved.txt) | `find_blank_coords(G1)` → int[6] | `2 4 0 3 3 0` |
+| *(참고)* | [`d_loc_01_g1.json`](../tests/golden/d_loc_01_g1.json) | grid·좌표 문서용 | `[[2,4],[3,3]]` |
 | **D-SOL-01** | [`tests/golden/d_sol_01_g1_step_a.approved.txt`](../tests/golden/d_sol_01_g1_step_a.approved.txt) | `solve_step_a(G1)` | `SUCCESS` + int[6] `2 4 8 3 3 7` |
 
 0-based 참고: `[[1,3],[2,2]]` (PRD §5.2·문제정의 부록).
